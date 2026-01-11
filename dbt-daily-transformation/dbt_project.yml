@@ -1,0 +1,41 @@
+name: 'dbt_transformation'
+version: '1.0.0'
+config-version: 2
+
+profile: 'default'
+
+flags:
+  use_materialization_v2: True
+  warn_on_deprecated_test_config: False
+
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  
+clean-targets:         
+  - "target"
+  - "dbt_packages"
+
+models:
+  dbt_transformation:
+    staging:
+      +schema: staging      
+      +materialized: view
+
+    silver:
+      +schema: silver
+      +materialized: incremental
+      +incremental_strategy: merge
+      +file_format: delta
+      # A chave composta impede que o merge sobrescreva o histórico de horários diferentes
+      +unique_key: ['streamer_id', 'ingested_at_utc'] 
+
+    gold:
+      +schema: gold
+      +materialized: table
+      +file_format: delta

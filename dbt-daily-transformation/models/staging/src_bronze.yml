@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: bronze_data
+    catalog: workspace
+    schema: default
+    description: "Tabelas Delta brutas ingeridas pelo job Spark Streaming."
+    
+    config:
+      freshness:
+        warn_after: 
+          count: 6
+          period: hour
+        error_after: 
+          count: 24
+          period: hour
+      loaded_at_field: _ingested_at 
+
+    tables:
+      - name: bronze_twitch
+        description: "Dados brutos da API da Twitch."
+        columns:
+          - name: twitch_data 
+            data_tests:
+              - not_null
+          - name: ingestion_timestamp_utc
+            data_tests:
+              - not_null
+
+      - name: bronze_steam
+        description: "Dados brutos da API da Steam."
+        columns:
+          - name: id
+            data_tests:
+              - not_null
+          - name: ingestion_timestamp_utc
+            data_tests:
+              - not_null

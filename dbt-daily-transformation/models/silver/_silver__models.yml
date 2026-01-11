@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  # --- TWITCH LAYER ---
+  - name: silver_twitch_dedupe
+    description: "Tabela deduplicada de streams da Twitch via ROW_NUMBER. Base para o histórico temporal."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: 
+            - streamer_id
+            - ingested_at_utc
+          severity: error
+          
+    columns:
+      - name: streamer_id
+        data_tests:
+          - not_null
+      - name: ingested_at_utc
+        data_tests:
+          - not_null
+      - name: viewer_count
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: int
+
+  - name: silver_twitch_agg
+    description: "Agregação de visualizações da Twitch por jogo e timestamp para cruzamento na Gold."
+    columns:
+      - name: total_viewer_count
+        data_tests:
+          - not_null
+
+  # --- STEAM LAYER ---
+  - name: silver_steam_dedupe
+    description: "Dados deduplicados da Steam via DISTINCT para garantir unicidade por lote."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - steam_game_id
+            - ingested_at_utc
+          severity: error
+
+    columns:
+      - name: steam_game_id
+        data_tests:
+          - not_null
+      - name: ingested_at_utc
+        data_tests:
+          - not_null
+      - name: peak_players
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: bigint
+
+  - name: silver_steam_agg
+    description: "Formatação final dos dados da Steam para o grão de 10 minutos."

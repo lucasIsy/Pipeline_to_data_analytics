@@ -3,7 +3,7 @@
 # Raíz do problema e Solução
 Era necessário extrair metricas de 4 jogos para um projeto de análise de dados, porém, a extração dos dados via webscrapping(SteamDB e TwitchTracker) era impossibilitada pelo bloqueio da cloudflare. Esse projeto soluciona esse problema criando um pipeline que tem como fonte de dados as APIs oficiais(Steam/Twitch), garantindo escalabilidade e otimização dos recursos.
 
-*Esse projeto não tem relação oficial com a Steam ou Twitch, e os dados extraídos vão de acordo com as normas estabelecidas por cada uma.*
+*Esse projeto não tem relação oficial com a Steam ou Twitch*
 
 ## Estrutura do pipeline
 
@@ -16,7 +16,7 @@ Os dados são extraídos via REQUEST(HTTP) com autenticação Oauth a cada 10 mi
 - Oauth
   
 ### Armazenamento
-Pelo fato do monitoramento ocorrer de 10 em 10 minutos, em um unico mes é gerado 8.928 arquivos jsons. Para reduzir os custos com armazenamento, os dados no GCP storage persistem por 7 dias, ao mesmo tempo que os arquivos JSONs vão para uma tabela cumulativa do tipo delta no qual reduz em 83% o custo com armazenamento. [duas estrategias persistencia e delta]
+Pelo fato do monitoramento ocorrer de 10 em 10 minutos, em um unico mes é gerado 8.928 arquivos jsons. Para reduzir os custos com armazenamento, os dados no GCP storage persistem por 7 dias, ao mesmo tempo que os arquivos JSONs vão para uma tabela cumulativa do tipo delta no qual reduz em 83% o custo com armazenamento.
 - GCP Storage
 - Delta Lake
   
